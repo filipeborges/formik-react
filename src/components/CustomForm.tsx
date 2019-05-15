@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Formik, Field, Form, FormikActions, FormikProps } from 'formik';
+import { Formik, Field, Form, FormikActions, FormikProps, ErrorMessage } from 'formik';
 
 interface FormValues {
   firstName: string;
@@ -18,6 +18,18 @@ export default function CustomForm() {
   return (
     <Formik
       initialValues={formInitialValues}
+      validate={ (values: FormValues) => {
+        let errors: any = {};
+        if (!values.firstName) {
+          errors.firstName = 'Required';
+        } else if (values.firstName.length < 2) {
+          errors.firstName = 'Too short name';
+        }
+        if (values.age <= 0) {
+          errors.age = 'Invalid age';
+        }
+        return errors;
+      }}
       onSubmit={(values: FormValues, formikActions: FormikActions<FormValues>) => {
         setTimeout(() => {
           formikActions.setSubmitting(false)
@@ -27,16 +39,25 @@ export default function CustomForm() {
     >
       {(props: FormikProps<FormValues>) => (
         <Form>
-          <label htmlFor="firstName">First Name:</label>
-          <Field id="firstName" name="firstName" placeholder="Insert" type="text" />
+          <div>
+            <label htmlFor="firstName">First Name:</label>
+            <Field id="firstName" name="firstName" placeholder="Insert" type="text" />
+          </div>
+          <ErrorMessage name="firstName" component="div" />
 
-          <label htmlFor="lastName">Last Name:</label>
-          <Field id="lastName" name="lastName" placeholder="Insert" type="text" />
+          <div>
+            <label htmlFor="lastName">Last Name:</label>
+            <Field id="lastName" name="lastName" placeholder="Insert" type="text" />
+          </div>
+          <ErrorMessage name="lastName" component="div" />
 
-          <label htmlFor="age">Age:</label>
-          <Field id="age" name="age" type="number" />
+          <div>
+            <label htmlFor="age">Age:</label>
+            <Field id="age" name="age" type="number" />
+          </div>
+          <ErrorMessage name="age" component="div" />
 
-          <button disabled={props.isSubmitting} type="submit">
+          <button disabled={props.isSubmitting || !props.isValid} type="submit">
             Submit
           </button>
         </Form>
